@@ -6,8 +6,8 @@ DB_PATH = PROJECT_ROOT / "db" / "dnd_initiative_work.sqlite"
 
 def list_tables(conn: sqlite3.Connection):
     cur = conn.execute("""
-        SELECT pc_id, name, class_name, subclass, weapon_name
-        FROM dim_pc_template;
+        SELECT * FROM dim_monster;
+
 
     """)
     return cur.fetchall()

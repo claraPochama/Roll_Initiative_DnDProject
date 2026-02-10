@@ -15,7 +15,7 @@ def calc_mod(score: int) -> int:
 
 def parse_primary_attack(actions_str: str):
     """
-    Extract first weapon attack's +to-hit and dice expression from actions text.
+    Extract first weapon attack's hit dice expression from "actions".
     Returns (attack_bonus, damage_dice, actions_raw)
     """
     if not isinstance(actions_str, str) or not actions_str.strip():
@@ -30,7 +30,7 @@ def parse_primary_attack(actions_str: str):
             desc = str(action.get("desc", ""))
             if "Weapon Attack" in desc and "to hit" in desc:
                 m_to_hit = re.search(r"\+(\d+)\s+to hit", desc)
-                m_dice = re.search(r"\(([^)]+)\)", desc)  # usually the dice is the first (...) after "Hit:"
+                m_dice = re.search(r"\(([^)]+)\)", desc)
                 atk = int(m_to_hit.group(1)) if m_to_hit else None
                 dice = m_dice.group(1).replace(" ", "") if m_dice else None
                 return atk, dice, actions_str
@@ -53,7 +53,10 @@ def main():
     # Build curated rows
     curated = []
     for _, r in df.iterrows():
+
+        # use the 1st "hits" found in the 1st weapon attack description.
         atk_bonus, dmg_dice, actions_raw = parse_primary_attack(r.get("actions"))
+
         curated.append({
             "monster_name": r["name"],
             "challenge_rating": float(r.get("challenge_rating")) if pd.notna(r.get("challenge_rating")) else None,

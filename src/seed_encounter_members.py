@@ -21,9 +21,10 @@ def main():
     except Exception:
         pass
 
-    # Get encounter_template_id
+    # Finds the encounter template by name "L3 Trio vs 4 Goblins + 1 Bugbear"
     row = conn.execute(
-        "SELECT encounter_template_id FROM encounter_template WHERE name = ?;",
+        """SELECT encounter_template_id FROM encounter_template 
+           WHERE name = ?;""",
         (ENCOUNTER_NAME,)
     ).fetchone()
     if not row:
@@ -32,10 +33,12 @@ def main():
 
     # Get monster keys
     goblin_key = conn.execute(
-        "SELECT monster_key FROM dim_monster WHERE lower(monster_name)='goblin';"
+        """SELECT monster_key FROM dim_monster 
+        WHERE lower(monster_name)='goblin';"""
     ).fetchone()
     bugbear_key = conn.execute(
-        "SELECT monster_key FROM dim_monster WHERE lower(monster_name)='bugbear';"
+        """SELECT monster_key FROM dim_monster 
+           WHERE lower(monster_name)='bugbear';"""
     ).fetchone()
 
     if not goblin_key or not bugbear_key:
@@ -52,7 +55,7 @@ def main():
             VALUES (?, 'party', ?, ?, NULL, 1);
         """, (et_id, slot_name, pc_id))
 
-    # Insert 4 goblins as separate slots (keeps per-creature initiative clean)
+    # Insert 4 goblins as separate slots
     for i in range(1, 5):
         conn.execute("""
             INSERT OR IGNORE INTO encounter_template_member

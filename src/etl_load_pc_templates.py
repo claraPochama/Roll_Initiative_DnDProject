@@ -1,3 +1,30 @@
+'''
+
+import sqlite3
+import pandas as pd
+
+DB_PATH = "db/dnd_initiative.sqlite"
+CSV_PATH = "data/raw/pc_templates.csv"
+
+conn = sqlite3.connect(DB_PATH)
+df = pd.read_csv(CSV_PATH)
+
+df.to_sql(
+    "dim_pc_template",
+    conn,
+    if_exists="append",
+    index=False
+)
+
+conn.commit()
+conn.close()
+
+print("PC templates loaded successfully.")
+
+'''
+
+# Rewritten after DB somehow “write-blocked”
+
 import sqlite3
 import pandas as pd
 from pathlib import Path

@@ -1,7 +1,7 @@
 -- schema.sql
 -- D&D 5e-inspired initiative study (SQLite)
 -- Facts: simulation_run, participant_run, first_round_events
--- Dims: dim_monster, dim_equipment_weapon, dim_class (optional), dim_pc_template
+-- Dims: dim_monster, dim_pc_template, dim_equipment_weapon, dim_class
 -- Templates: encounter_template, encounter_template_member
 
 PRAGMA foreign_keys = ON;
@@ -10,12 +10,15 @@ PRAGMA foreign_keys = ON;
 -- Dimension tables
 -- -------------------------
 
--- Minimal class dimension (optional; you can populate from classes.csv if you want)
+/* Removed
+-- Class dimension
 CREATE TABLE IF NOT EXISTS dim_class (
   class_key       INTEGER PRIMARY KEY,
   class_name      TEXT NOT NULL UNIQUE
 );
+*/
 
+/* Removed
 -- Weapons only (curated from equipment.csv)
 CREATE TABLE IF NOT EXISTS dim_equipment_weapon (
   weapon_key      INTEGER PRIMARY KEY,
@@ -23,8 +26,9 @@ CREATE TABLE IF NOT EXISTS dim_equipment_weapon (
   weapon_type     TEXT,              -- melee/ranged
   damage_dice     TEXT,              -- e.g. "1d8"
   damage_type     TEXT,              -- piercing/slashing/etc
-  properties_json TEXT               -- optional, store as JSON string
+  properties_json TEXT               -- notes stored as JSON string
 );
+*/
 
 -- Monsters (curated from monsters.csv). Keep flexible: CSVs vary a lot.
 CREATE TABLE IF NOT EXISTS dim_monster (
@@ -39,7 +43,7 @@ CREATE TABLE IF NOT EXISTS dim_monster (
   actions_json     TEXT               -- optional: raw actions from CSV as JSON-ish text
 );
 
--- PC templates you control (from pc_templates.csv)
+-- PC templates (from pc_templates.csv)
 CREATE TABLE IF NOT EXISTS dim_pc_template (
   pc_id             TEXT PRIMARY KEY,  -- e.g. "PC_RGR_GLOOMSTALKER_L3"
   name              TEXT NOT NULL,
@@ -103,7 +107,7 @@ CREATE TABLE IF NOT EXISTS encounter_template_member (
 CREATE TABLE IF NOT EXISTS simulation_run (
   run_id                 INTEGER PRIMARY KEY,
   encounter_template_id   INTEGER NOT NULL,
-  seed                   INTEGER,              -- optional: store PRNG seed for reproducibility
+  seed                   INTEGER,              -- store PRNG seed for reproducibility
   party_victory           INTEGER NOT NULL CHECK (party_victory IN (0,1)),
   winner                 TEXT NOT NULL CHECK (winner IN ('party','monsters','timeout')),
   rounds_taken            INTEGER NOT NULL,
@@ -147,12 +151,12 @@ CREATE TABLE IF NOT EXISTS participant_run (
   FOREIGN KEY (monster_key) REFERENCES dim_monster(monster_key)
 );
 
--- Optional but powerful for your initiative questions
+-- Was optional but now useful for initiative questions
 CREATE TABLE IF NOT EXISTS first_round_events (
   run_id                                   INTEGER PRIMARY KEY,
   damage_party_before_first_monster_turn    INTEGER NOT NULL DEFAULT 0,
   monsters_downed_before_first_monster_turn INTEGER NOT NULL DEFAULT 0,
-  party_downed_before_first_monster_turn    INTEGER NOT NULL DEFAULT 0,
+  party_downed_before_first_player_turn    INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY (run_id) REFERENCES simulation_run(run_id) ON DELETE CASCADE
 );
 
@@ -163,3 +167,9 @@ CREATE INDEX IF NOT EXISTS idx_simrun_encounter ON simulation_run(encounter_temp
 CREATE INDEX IF NOT EXISTS idx_participant_side ON participant_run(side);
 CREATE INDEX IF NOT EXISTS idx_participant_initorder ON participant_run(init_order);
 CREATE INDEX IF NOT EXISTS idx_participant_template ON participant_run(template_type, pc_id, monster_key);
+
+ALTER TABLE first_round_events
+RENAME COLUMN party_downed_before_first_monster_turn
+TO party_downed_before_first_player_turn;
+
+

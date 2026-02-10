@@ -1,3 +1,5 @@
+# Updated for pc_template after DB somehow “write-blocked” and a new DB (dnd_initiative_work.sqlite) created
+
 import sqlite3
 import pandas as pd
 from pathlib import Path
