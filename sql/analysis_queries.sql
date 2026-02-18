@@ -10,11 +10,11 @@ SELECT AVG(party_victory) AS party_win_rate
 FROM simulation_run
 WHERE notes_flags_json LIKE '%"phase":"combat"%';
 
---- A-1) Party average initiative total vs win rate ---
+--- A-2) Party initiative sum vs win rate ---
 WITH party_init AS (
   SELECT
     sr.run_id,
-    AVG(pr.init_total) AS party_init_avg
+    SUM(pr.init_total) AS party_init
   FROM simulation_run sr
   JOIN participant_run pr ON pr.run_id = sr.run_id
   WHERE sr.notes_flags_json LIKE '%"phase":"combat"%'
@@ -22,14 +22,33 @@ WITH party_init AS (
   GROUP BY sr.run_id
 )
 SELECT
-  ROUND(party_init_avg, 2) AS party_init_avg,
+  party_init,
   AVG(sr.party_victory) AS win_rate,
   COUNT(*) AS runs
 FROM party_init
 JOIN simulation_run sr ON sr.run_id = party_init.run_id
-GROUP BY ROUND(party_init_avg, 2)
-ORDER BY party_init_avg;
+GROUP BY party_init
+ORDER BY party_init;
 
+
+--- A-3) Party initiative sum distribution ---
+WITH party_init AS (
+  SELECT
+    sr.run_id,
+    SUM(pr.init_total) AS party_init
+  FROM simulation_run sr
+  JOIN participant_run pr ON pr.run_id = sr.run_id
+  WHERE sr.notes_flags_json LIKE '%"phase":"combat"%'
+    AND pr.side = 'party'
+  GROUP BY sr.run_id
+)
+SELECT
+  party_init AS party_init_avg,
+  COUNT(*) AS runs
+FROM party_init
+JOIN simulation_run sr ON sr.run_id = party_init.run_id
+GROUP BY party_init
+ORDER BY party_init;
 
 --- B) Does “Rogue beats Bugbear” affect win rate? ---
 WITH rb AS (
@@ -59,7 +78,8 @@ GROUP BY rogue_beats_bugbear;
 --- C) Alpha-strike: damage before first monster turn vs win rate ---
 SELECT
   CASE
-    WHEN damage_party_before_first_monster_turn < 5 THEN '0-4'
+    WHEN damage_party_before_first_monster_turn < 1 THEN '0'
+    WHEN damage_party_before_first_monster_turn < 5 THEN '1-4'
     WHEN damage_party_before_first_monster_turn < 15 THEN '5-14'
     WHEN damage_party_before_first_monster_turn < 25 THEN '15-24'
     ELSE '25+'
@@ -77,7 +97,7 @@ SELECT
   fre.run_id,
   fre.damage_party_before_first_monster_turn,
   fre.monsters_downed_before_first_monster_turn,
-  fre.party_downed_before_first_monster_turn,
+  fre.party_downed_before_first_player_turn,
   sr.party_victory,
   sr.rounds_taken
 FROM first_round_events fre
@@ -110,6 +130,19 @@ JOIN simulation_run sr ON sr.run_id = pr.run_id
 WHERE sr.notes_flags_json LIKE '%"phase":"combat"%'
 GROUP BY pr.side, pr.name
 ORDER BY avg_damage_dealt DESC;
+
+--- E-1) crit rate per attack + attacks per run ---
+
+SELECT
+  name,
+  COUNT(*) AS runs,
+  ROUND(AVG(attacks_made), 3) AS avg_attacks,
+  ROUND(AVG(crits_landed), 4) AS avg_crits,
+  ROUND(1.0 * SUM(crits_landed) / NULLIF(SUM(attacks_made), 0), 4) AS crit_per_attack
+FROM participant_run
+WHERE side = 'party'
+GROUP BY name
+ORDER BY name;
 
 --- F) Party vs Monsters average total damage (per run) ---
 SELECT
@@ -214,6 +247,3 @@ FROM simulation_run
 WHERE notes_flags_json LIKE '%"phase":"combat"%';
 
 
-SELECT monsters_downed_before_first_monster_turn
-fROM first_round_events
-GROUP BY monsters_downed_before_first_monster_turn;

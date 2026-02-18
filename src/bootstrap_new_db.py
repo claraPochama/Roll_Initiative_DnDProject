@@ -4,7 +4,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = PROJECT_ROOT / "sql" / "schema.sql"
 
-# New DB file (separate from the one PyCharm is browsing heavily)
+# New DB file
 NEW_DB_PATH = PROJECT_ROOT / "db" / "dnd_initiative_work.sqlite"
 
 def main():
