@@ -1,9 +1,10 @@
 {WIP!}
-Roll Initiative: A Data-Driven Analysis of First-Mover Advantage
 
-*Executive Summary*
+***Roll Initiative: A Data-Driven Analysis of First-Mover Advantage***
 
-“... Roll initiative!” says your dungeon master.
+**Executive Summary**
+
+*“... Roll initiative!”* says your dungeon master.
 
 In turn-based games, this single moment often decides the tempo of everything that follows. 
 It begins the same way: a dice roll, a number, to determine an order.
@@ -12,7 +13,7 @@ Sometimes the fastest character goes first; Sometimes they don’t. It looks ran
 This project explores initiative as a measurable system. By simulating thousands of combat encounters and analyzing their outcomes, it examines how initiative order shapes combat outcomes, damage, and win rate. 
 
 
-*What each file does*
+**What each file does**
 
 SQL
 
