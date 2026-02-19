@@ -219,6 +219,14 @@ FROM participant_run
 GROUP BY side, name
 ORDER BY side, survival_rate DESC, name;
 
+SELECT
+  run_id,
+  side,
+  name,
+  init_total,
+  alive_end
+FROM participant_run
+WHERE side = 'party';
 
 --- (One table version) ---
 SELECT
