@@ -6,7 +6,7 @@ The outcomes are analysed and presented with SQL, Python, and Tableau.
 
 The simulation results confirm that initiative order positively correlates with win rate, but they also reveal that victory emerges from interacting factors rather than order alone. The effect depends on a chain of interactions: early turn order influences early burst damage, which changes who gets downed first; that survivability shift then determines total party damage and ultimately the outcome. 
 
-This project taught me two things: (1) “Initiative advantage” is not a standalone variable—it is mediated by model rules (targeting, burst windows, and snowball effects). (2) Simulation conclusions must be framed as scenario-specific, not as general game balance claims. 
+This project taught me two things: (1) “Initiative advantage” is not a standalone variable, but mediated by model rules (targeting, burst windows, and snowball effects). (2) Simulation conclusions must be framed as scenario-specific, not as general game balance claims. 
 
 Next, I plan to stress-test the model by randomizing or weighting monster targeting to measure how robust the initiative–win relationship remains.
 
